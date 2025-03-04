@@ -1,15 +1,45 @@
 services:
-  dt-labs:
-    build: .
-    container_name: dt-labs
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dtlabs-backend
+
     restart: always
+    ports:
+      - "8000:8000"
     env_file:
       - .env
-
-    ports:
-      - 5432:5432
+    environment:
+      - ENV=Docker
+    depends_on:
+      - db
+    networks:
+      - dtlabs-network
     volumes:
-      - timescale_data:/var/lib/postgresql/data
+      - ./app:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+
+  db:
+    image: postgres:15-alpine
+    container_name: dtlabs-postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dtlabs-network
+
+networks:
+  dtlabs-network:
+    driver: bridge
 
 volumes:
-  timescale_data:
+  postgres_data:
