@@ -1,11 +1,3 @@
-
-<style>
-  .responsive-img {
-    max-width: 100%;
-    height: auto;
-  }
-</style>
-
 # Exame Backend DtLabs 2025
 ## Layout
 
